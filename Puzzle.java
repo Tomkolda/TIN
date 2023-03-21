@@ -1,77 +1,92 @@
-package Puzzle8;
+package cz.vutbr.feec.cisla;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
-public class Puzzle {
-	public static final int NAHORU = 1;
-	 public static final int DOLU = 2;
-	 public static final int VLEVO = 3;
-	 public static final int VPRAVO = 4;
-	
-	private int[][] pole = {{7,2,4},{5,0,6},{8,3,1}};
-	private int x = 1;
-	private int y = 1;
-	private ArrayList<String> pohyby = new ArrayList<>();
-	
-	public void posun(int smer) {
-		
-		switch (smer){
-		case NAHORU:
-			if(y>0 && y<=2) {
-				pole[y][x] = pole[y-1][x];
-				pole[y-1][x] = 0;
-				y--;
-				pohyby.add("nahoru");
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
+public class HraciPole{
+	private int[][] data = { { 1, 4, 7 }, { 2, 5, 8 }, { 3, 6, -1 } };
+	private int x = 2;
+	private int y = 2;
+	private ArrayList<Integer> pohyby = new ArrayList<Integer>();
+
+	public static final int UP = 1;
+	public static final int DOWN = 2;
+	public static final int LEFT = 3;
+	public static final int RIGHT = 4;
+
+	public HraciPole klonujAPohni(int smer) {
+		HraciPole nove = new HraciPole();
+		nove.x = this.x;
+		nove.y = this.y;
+		nove.pohyby.addAll(this.pohyby);
+		nove.pohyby.add(smer);
+		for (int x = 0; x < 3; x++) {
+			for (int y = 0; y < 3; y++) {
+				nove.data[x][y] = this.data[x][y];
 			}
-			else {
-				System.out.println("Tento pohyb nelze provest");
-			}
-			break;
-		case DOLU:
-			if(y<2 && y>=0) {
-				pole[y][x] = pole[y+1][x];
-				pole[y+1][x] = 0;
-				y++;
-				pohyby.add("dolu");
-			}
-			else {
-				System.out.println("Tento pohyb nelze provest");
-			}
-			break;
-		case VLEVO:
-			if(x>0 && x <= 2) {
-				pole[y][x] = pole[y][x-1];
-				pole[y][x-1] = 0;
-				x--;
-				pohyby.add("vlevo");
-			}
-			else {
-				System.out.println("Tento pohyb nelze provest");
-			}
-			break;
-		case VPRAVO:
-			if(x<2 && x >= 0) {
-				pole[y][x] = pole[y][x+1];
-				pole[y][x+1] = 0;
-				x++;
-				pohyby.add("vpravo");
-			}
-			else {
-				System.out.println("Tento pohyb nelze provest");
-			}
-			break;
-		
 		}
-		
+
+		boolean jeMozny = nove.pohni(smer);
+		if (jeMozny) {
+			return nove;
+		} else {
+			return null;
+		}
 	}
 
+	public boolean pohni(int smer) {
+		switch (smer) {
+		case UP:
+			// nahoru
+			if (y < 1) {
+				return false;
+			}
+			data[x][y] = data[x][y - 1];
+			data[x][y - 1] = -1;
+			y = y - 1; // y--;
+			//pohyby.add(1);
+			return true;
+		case DOWN:
+			// nahoru
+			if (y > 1) {
+				return false;
+			}
+			data[x][y] = data[x][y + 1];
+			data[x][y + 1] = -1;
+			y++; // y = y + 1;
+			//pohyby.add(2);
+			return true;
+		case LEFT:
+			// nahoru
+			if (x < 1) {
+				return false;
+			}
+			data[x][y] = data[x - 1][y];
+			data[x - 1][y] = -1;
+			x = x - 1; // y--;
+			//pohyby.add(3);
+			return true;
+		case RIGHT:
+			if (x > 1) {
+				return false;
+			}
+			data[x][y] = data[x + 1][y];
+			data[x + 1][y] = -1;
+			x++; // y = y + 1;
+			//pohyby.add(4);
+			return true;// TODO
+		}
+		return false;
+	}
+
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + Arrays.deepHashCode(pole);
+		result = prime * result + Arrays.deepHashCode(data);
 		result = prime * result + x;
 		result = prime * result + y;
 		return result;
@@ -85,8 +100,8 @@ public class Puzzle {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Puzzle other = (Puzzle) obj;
-		if (!Arrays.deepEquals(pole, other.pole))
+		HraciPole other = (HraciPole) obj;
+		if (!Arrays.deepEquals(data, other.data))
 			return false;
 		if (x != other.x)
 			return false;
@@ -95,41 +110,49 @@ public class Puzzle {
 		return true;
 	}
 	
-
-	
-	public String toString() {
-		for (int i = 0; i < 3; i++) {
-			for (int j = 0; j < 3; j++) {
-				System.out.print(pole[i][j] + " ");
-			}
-			System.out.println();
-		}
-		System.out.println("X = " + x + " Y = " + y);
-		System.out.print("Pohyby: ");
-		for (int k = 0; k < pohyby.size(); k++) {
-			System.out.print(pohyby.get(k)+", ");
-		}
-		System.out.println();
-		return "";
-	}
-
 	public boolean jeReseni() {
-		int [][] reseni = {{1, 4, 7}, {2, 5, 8}, {3, 6, 0}};
+		int [][] reseni = {{1, 4, 7}, {2, 5, 8}, {3, 6, -1}};
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
-				if(pole[i][j] != reseni[i][j]) {
+				if(data[i][j] != reseni[i][j]) {
 					return false;
 				}
 			}
 		}
 		return true;
 	}
-	
-	public Puzzle klonujAPohni(int smer){
-		posun(smer);
-		return this;
+
+	@Override
+	public String toString() {
+		String res = "pohyby:" + pohyby + "\n";
+		for (int iy = 0; iy < 3; iy++) {
+			for (int ix = 0; ix < 3; ix++) {
+				res += data[ix][iy] + ",";
+			}
+			res += "\n";
+		}
+		return res;
+	}
+
+	public int[][] getData() {
+		return data;
+	}
+
+	public void setData(int[][] data) {
+		this.data = data;
+	}
+
+	public ArrayList<Integer> getPohyby() {
+		return pohyby;
+	}
+
+
+	public void setPohyby() {
+		pohyby = new ArrayList<Integer>();
+		
 	}
 	
 	
 	
 }
+
